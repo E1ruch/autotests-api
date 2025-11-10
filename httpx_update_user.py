@@ -33,34 +33,3 @@ user_id = create_response.json()['user']['id']
 user_patch = httpx.patch(f'http://localhost:8000/api/v1/users/{user_id}', headers=headers, json=patch_user_data)
 print(user_patch.status_code)
 print(user_patch.json())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-logindata = {
-    "email": "1234567@qa.com",
-    "password": "123456",
-}
-response = httpx.post('http://localhost:8000/api/v1/authentication/login', json=logindata)
-print(response.json())
-tokendata = {
-    "accessToken": response.json()['token']['accessToken']
-}
-print("Получил:",tokendata)
-
-headers = {"Authorization": f"Bearer {tokendata['accessToken']}"}
-
-response = httpx.get('http://localhost:8000/api/v1/users/me', headers=headers)
-
-print(response.json())
-print(response.status_code)
