@@ -1,9 +1,11 @@
 from typing import TypedDict
+
 from httpx import Response
+
 from clients.api_client import APIClient
 from clients.public_http_builder import get_public_http_client
 
-
+# Добавили описание структуры пользователя
 class User(TypedDict):
     """
     Описание структуры пользователя.
@@ -14,10 +16,9 @@ class User(TypedDict):
     firstName: str
     middleName: str
 
-
-class CreateUserRequest(TypedDict):
+class CreateUsersRequestDict(TypedDict):
     """
-    Описание структуры запроса для создания нового пользователя.
+    Описание структуры запроса на создание пользователя.
     """
     email: str
     password: str
@@ -25,7 +26,7 @@ class CreateUserRequest(TypedDict):
     firstName: str
     middleName: str
 
-
+# Добавили описание структуры ответа создания пользователя
 class CreateUserResponseDict(TypedDict):
     """
     Описание структуры ответа создания пользователя.
@@ -35,23 +36,24 @@ class CreateUserResponseDict(TypedDict):
 
 class PublicUsersClient(APIClient):
     """
-    Клиент для публичных операций с пользователями, не требующих авторизации.
+    Клиент для работы с /api/v1/users
     """
-
-    def create_user_api(self, request: CreateUserRequest) -> Response:
+    def create_user_api(self, requests: CreateUsersRequestDict) -> Response:
         """
-        Создаёт нового пользователя в системе.
+        Метод создает пользователя.
 
-        :param request: Данные нового пользователя в формате CreateUserRequest.
-        :return: Ответ от сервера в виде объекта httpx.Response.
+        :param requests: Словарь с email, password, lastName, firstName, middleName.
+        :return: Ответ от сервера в виде объекта httpx.Response
         """
-        return self.post("/api/v1/users", json=request)
+        return self.post("api/v1/users", json=requests)
 
-    def create_user(self, request: CreateUserRequest) -> CreateUserResponseDict:
-        response = self.create_user_api(request=request)
+    # Добавили новый метод
+    def create_user(self, request: CreateUsersRequestDict) -> CreateUserResponseDict:
+        response = self.create_user_api(request)
         return response.json()
 
 
+# Добавляем builder для PublicUsersClient
 def get_public_users_client() -> PublicUsersClient:
     """
     Функция создаёт экземпляр PublicUsersClient с уже настроенным HTTP-клиентом.

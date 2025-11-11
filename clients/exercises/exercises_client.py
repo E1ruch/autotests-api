@@ -1,9 +1,38 @@
 from typing import TypedDict
 
 from httpx import Response
-
+from clients.private_http_builder import AuthenticationUserDict, get_private_http_client
 from clients.api_client import APIClient
 
+class Exercise(TypedDict):
+    id: str
+    title: str
+    courseId: str
+    maxScore: int
+    minScore: int
+    orderIndex: int
+    description: str
+    estimatedTime: str
+
+class GetExercisesResponseDict(TypedDict):
+    exercises: list[Exercise]
+
+
+class GetExerciseResponseDict(TypedDict):
+    exercise: Exercise
+
+
+class CreateExercisesResponseDict(TypedDict):
+    exercise: Exercise
+
+
+class UpdateExercisesResponseDict(TypedDict):
+    title: str
+    maxScore: int
+    minScore: int
+    orderIndex: int
+    description: str
+    estimatedTime: str
 
 class GetExercisesQueryDict(TypedDict):
     """
@@ -88,3 +117,34 @@ class ExercisesClient(APIClient):
         :return: Ответ от сервера в виде объекта httpx.Response
         """
         return self.delete(f"/api/v1/exercises/{exercise_id}")
+
+    def get_exercises(self, query: GetExercisesQueryDict) -> GetExercisesResponseDict:
+        response = self.get_exercises_api(query)
+        return response.json()
+
+    def get_exercise(self, exercise_id: str) -> GetExerciseResponseDict:
+        response = self.get_exercise_api(exercise_id)
+        return response.json()
+
+    def create_exercise(self, request: CreateExercisesRequestDict) -> CreateExercisesResponseDict:
+        response = self.create_exercise_api(request)
+        if response is None:
+            raise ValueError("create_exercise_api() вернул None")
+        return response.json()
+
+    def update_exercise(self, exercise_id: str, request: UpdateExercisesRequestDict) \
+                -> UpdateExercisesResponseDict:
+            response = self.update_exercise_api(exercise_id, request)
+            return response.json()
+
+    def delete_exercise(self, exercise_id: str):
+            response = self.delete_exercise_api(exercise_id)
+            return response.json()
+
+    def get_exercise_client(user: AuthenticationUserDict) -> ExercisesClient:
+        """
+        Функция создаёт экземпляр ExerciseClient сHTTP-клиентом.
+
+        :return: Готовый к использованию ExerciseClient.
+        """
+        return ExercisesClient(client=get_private_http_client(user))

@@ -21,9 +21,7 @@ def get_private_http_client(user: AuthenticationUserDict) -> Client:
     # Инициализируем AuthenticationClient для аутентификации
     authentication_client = get_authentication_client()
 
-    # Инициализируем запрос на аутентификацию
     login_request = LoginRequestDict(email=user['email'], password=user['password'])
-    # Выполняем POST запрос и аутентифицируемся
     login_response = authentication_client.login(login_request)
 
     return Client(
